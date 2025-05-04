@@ -1,38 +1,434 @@
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  line-height: 1.6;
+}
+
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header Styles */
+.App-header {
+  background-color: #1e1e1e;
+  color: #bb86fc;
+  padding: 2rem 0;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.App-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.App-header h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background-color: #bb86fc;
+  animation: titleUnderline 2s ease-in-out forwards;
+}
+
+@keyframes titleUnderline {
+  to {
+    width: 100%;
+  }
+}
+
+/* Layout Styles */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  flex: 1;
+}
+
+/* Questions List Layout - Simple and User-friendly */
+.questions-grid {
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  margin: 2rem auto;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Instructions Box Styles */
+.instructions-box {
+  background-color: rgba(187, 134, 252, 0.1);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #bb86fc;
+}
+
+.instructions-text {
+  color: #03dac6;
+  font-size: 1rem;
+  margin: 0;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+/* Question Item Styles */
+.question-plate {
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid #bb86fc;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.question-plate:hover {
+  background-color: #252525;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.question-content h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #e0e0e0;
+  display: flex;
+  align-items: center;
+}
+
+.question-content h3::before {
+  content: attr(data-number);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  min-width: 28px;
+  height: 28px;
+  background-color: #bb86fc;
+  color: #121212;
+  border-radius: 50%;
+  margin-right: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
-.App-link {
-  color: #61dafb;
+/* Answer View Styling */
+.answer-container {
+  display: block;
+  width: 100%;
+  min-height: 60vh;
+  padding-top: 1rem;
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #bb86fc;
+  margin-top: 2rem;
+}
+
+/* Answer Box Styles */
+.answer-box {
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  border-top: 4px solid #bb86fc;
+  overflow-x: auto;
+}
+
+/* Question Title in Answer View */
+.question-title {
+  color: #e0e0e0;
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-left: 1.5rem;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+}
+
+.question-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #bb86fc;
+  border-radius: 4px;
+}
+
+.question-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  background-color: #bb86fc;
+  color: #121212;
+  border-radius: 50%;
+  margin-right: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Answer Content Styles */
+.answer-content {
+  margin: 1.5rem 0;
+}
+
+.answer-label {
+  color: #03dac6;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  background-color: rgba(3, 218, 198, 0.1);
+  border-radius: 4px;
+}
+
+.answer-details {
+  background-color: #252525;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #03dac6;
+}
+
+/* Navigation Controls */
+.navigation-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  gap: 1.5rem;
+}
+
+.nav-button {
+  background-color: #bb86fc;
+  color: #121212;
+  border: none;
+  border-radius: 50px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  min-width: 120px;
+}
+
+/* Button Variants */
+.prev-button {
+  background-color: #bb86fc;
+}
+
+.next-button {
+  background-color: #03dac6;
+}
+
+/* Button States */
+.nav-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  opacity: 0.9;
+}
+
+.nav-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Navigation Icons */
+.nav-icon {
+  display: inline-block;
+  color: #121212;
+  font-size: 1rem;
+  margin: 0 0.4rem;
+  font-weight: bold;
+  transition: transform 0.3s ease;
+}
+
+.prev-button:hover .nav-icon {
+  transform: translateX(-3px);
+}
+
+.next-button:hover .nav-icon {
+  transform: translateX(3px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Code Block Styling */
+pre {
+  background-color: #1a1a1a;
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-left: 4px solid #03dac6;
+}
+
+code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: #e0e0e0;
+  line-height: 1.5;
+  display: block;
+}
+
+.question-answer h3 {
+  color: #bb86fc;
+  margin: 1.5rem 0 0.5rem 0;
+}
+
+.question-answer h4 {
+  color: #03dac6;
+  margin: 1.2rem 0 0.5rem 0;
+}
+
+.question-answer p {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+}
+
+.question-answer ul, .question-answer ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.question-answer li {
+  margin-bottom: 0.5rem;
+}
+
+
+
+footer {
+  background-color: #1e1e1e;
+  color: #bb86fc;
+  text-align: center;
+  padding: 1.5rem 0;
+  margin-top: 2rem;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .question-plate {
+    width: 280px;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .answer-box {
+    max-width: 90%;
+    padding: 2rem;
+  }
+  
+  pre {
+    padding: 0.8rem;
+  }
+  
+  code {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .App-header h1 {
+    font-size: 2rem;
+  }
+  
+  .question-plate {
+    width: 240px;
+    height: 130px;
+    padding: 1.2rem;
+  }
+  
+  .question-content h3 {
+    font-size: 0.95rem;
+  }
+  
+  .question-title {
+    font-size: 1.4rem;
+  }
+  
+  .answer-label {
+    font-size: 1.2rem;
+  }
+  
+  pre {
+    padding: 0.7rem;
+  }
+  
+  code {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Mobile Layout Adjustments */
+  .questions-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .question-plate {
+    width: 100%;
+    max-width: 320px;
+    height: 120px;
+  }
+  
+  .container {
+    padding: 1.5rem 1rem;
+  }
+  
+  /* Mobile Answer View */
+  .answer-box {
+    padding: 1.5rem 1rem;
+  }
+  
+  .question-title {
+    font-size: 1.2rem;
+  }
+  
+  /* Mobile Code Blocks */
+  pre {
+    padding: 0.6rem;
+  }
+  
+  code {
+    font-size: 0.75rem;
   }
 }
