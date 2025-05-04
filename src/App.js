@@ -61,26 +61,17 @@ const QuestionComponents = questionsList.map(item => ({
 
 function App() {
   const [activeQuestion, setActiveQuestion] = useState(null);
+  const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
 
-  // Handle browser history for back button functionality
+  // Handle initial URL and browser back button
   useEffect(() => {
-    // Check URL params on initial load (only once)
-    const params = new URLSearchParams(window.location.search);
-    const questionParam = params.get('q');
-    if (questionParam) {
-      const questionId = parseInt(questionParam, 10);
-      if (!isNaN(questionId) && questionId > 0 && questionId <= questionsList.length) {
-        setActiveQuestion(questionId);
-      }
-    }
-
-    // Handle the popstate event (when back button is clicked)
-    const handlePopState = () => {
-      const currentParams = new URLSearchParams(window.location.search);
-      const currentQuestionParam = currentParams.get('q');
+    // Function to update active question based on URL
+    const updateActiveQuestionFromURL = () => {
+      const params = new URLSearchParams(window.location.search);
+      const questionParam = params.get('q');
       
-      if (currentQuestionParam) {
-        const questionId = parseInt(currentQuestionParam, 10);
+      if (questionParam) {
+        const questionId = parseInt(questionParam, 10);
         if (!isNaN(questionId) && questionId > 0 && questionId <= questionsList.length) {
           setActiveQuestion(questionId);
         }
@@ -88,17 +79,20 @@ function App() {
         setActiveQuestion(null);
       }
     };
-
-    // Add event listener for back button
-    window.addEventListener('popstate', handlePopState);
-
+    
+    // Check URL params on initial load
+    updateActiveQuestionFromURL();
+    
+    // Handle the popstate event (when back button is clicked)
+    window.addEventListener('popstate', updateActiveQuestionFromURL);
+    
     // Clean up event listener
     return () => {
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('popstate', updateActiveQuestionFromURL);
     };
-  }, []); 
+  }, [questionsList.length]);
 
-  // Update URL when activeQuestion changes
+  // Update URL when activeQuestion changes and scroll to top
   useEffect(() => {
     // Get current URL state
     const currentUrl = new URL(window.location.href);
@@ -108,21 +102,128 @@ function App() {
     // Only update history if the state actually changed
     if (activeQuestion !== currentQuestionId) {
       if (activeQuestion) {
-        // When a question is selected, replace the current state
-        window.history.pushState(null, '', `?q=${activeQuestion}`);
+        // When a question is selected, push a new state to history
+        window.history.pushState({questionId: activeQuestion}, '', `?q=${activeQuestion}`);
+        
+        // Scroll to the top of the page instantly
+        window.scrollTo(0, 0);
       } else {
-        // When going back to the questions list, replace the current state
-        window.history.pushState(null, '', `/`);
+        // When going back to the questions list, push a new state to history
+        window.history.pushState({questionId: null}, '', `/`);
       }
     }
   }, [activeQuestion]);
+  
+  // Add keyboard navigation
+  useEffect(() => {
+    // Only add keyboard listeners when a question is active
+    if (!activeQuestion) return;
+    
+    const handleKeyDown = (e) => {
+      // Set keyboard navigating state to true when using navigation keys
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'].includes(e.key) && 
+          !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        setIsKeyboardNavigating(true);
+        
+        // Only prevent default for navigation keys
+        if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
+          e.preventDefault();
+        }
+      }
+      
+      // Left arrow key - previous question (only when not in text field)
+      if (e.key === 'ArrowLeft' && activeQuestion > 1 && 
+          !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        toggleQuestion(activeQuestion - 1);
+      }
+      
+      // Right arrow key - next question (only when not in text field)
+      if (e.key === 'ArrowRight' && activeQuestion < QuestionComponents.length && 
+          !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        toggleQuestion(activeQuestion + 1);
+      }
+      
+      // Up arrow key - scroll up (only when not in text field)
+      if (e.key === 'ArrowUp' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        window.scrollBy({
+          top: -100,
+          behavior: 'smooth'
+        });
+      }
+      
+      // Down arrow key - scroll down (only when not in text field)
+      if (e.key === 'ArrowDown' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        window.scrollBy({
+          top: 100,
+          behavior: 'smooth'
+        });
+      }
+      
+      // Page Up key - scroll up more (only when not in text field)
+      if (e.key === 'PageUp' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        window.scrollBy({
+          top: -500,
+          behavior: 'smooth'
+        });
+      }
+      
+      // Page Down key - scroll down more (only when not in text field)
+      if (e.key === 'PageDown' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        window.scrollBy({
+          top: 500,
+          behavior: 'smooth'
+        });
+      }
+      
+      // Home key - scroll to top (only when not in text field)
+      if (e.key === 'Home' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+      
+      // End key - scroll to bottom (only when not in text field)
+      if (e.key === 'End' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+      
+      // Escape key - go back to questions list
+      if (e.key === 'Escape') {
+        setActiveQuestion(null);
+        window.scrollTo(0, 0);
+      }
+    };
+    
+    // Mouse movement handler to disable keyboard navigation mode
+    const handleMouseMove = () => {
+      if (isKeyboardNavigating) {
+        setIsKeyboardNavigating(false);
+      }
+    };
+    
+    // Add event listeners
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [activeQuestion, QuestionComponents.length, isKeyboardNavigating]);
 
   const toggleQuestion = (id) => {
     setActiveQuestion(id);
+    // Scroll to top immediately when toggling questions (instant scroll)
+    window.scrollTo(0, 0);
   };
 
   return (
-    <div className="App">
+    <div className={`App ${isKeyboardNavigating ? 'keyboard-navigating' : ''}`}>
       <header className="App-header">
         <h1>FSD ASSIGNMENT II</h1>
       </header>
@@ -130,10 +231,22 @@ function App() {
         {activeQuestion ? (
           <div className="answer-container">
             <div className="answer-box">
-              <h2 className="question-title">
-                <span className="question-number">{activeQuestion}</span>
-                {QuestionComponents.find(q => q.id === activeQuestion)?.question}
-              </h2>
+              <div className="question-header">
+                <button 
+                  className="nav-button home-button" 
+                  onClick={() => {
+                    setActiveQuestion(null);
+                    window.scrollTo(0, 0);
+                  }}
+                  title="Return to questions list (Escape key)"
+                >
+                  <span className="nav-icon">⌂</span> Home
+                </button>
+                <h2 className="question-title">
+                  <span className="question-number">{activeQuestion}</span>
+                  {QuestionComponents.find(q => q.id === activeQuestion)?.question}
+                </h2>
+              </div>
               <div className="answer-content">
                 {QuestionComponents.find(q => q.id === activeQuestion)?.component && (
                   <React.Fragment>
@@ -148,6 +261,7 @@ function App() {
                         <button 
                           className="nav-button prev-button" 
                           onClick={() => toggleQuestion(activeQuestion - 1)}
+                          title="Previous question (Left Arrow key)"
                         >
                           <span className="nav-icon">←</span> Previous
                         </button>
@@ -156,10 +270,14 @@ function App() {
                         <button 
                           className="nav-button next-button" 
                           onClick={() => toggleQuestion(activeQuestion + 1)}
+                          title="Next question (Right Arrow key)"
                         >
                           Next <span className="nav-icon">→</span>
                         </button>
                       )}
+                    </div>
+                    <div className="keyboard-hint">
+                      <span>Keyboard shortcuts: <kbd>←</kbd> Previous | <kbd>→</kbd> Next | <kbd>↑</kbd> Scroll Up | <kbd>↓</kbd> Scroll Down | <kbd>Esc</kbd> Home</span>
                     </div>
                   </React.Fragment>
                 )}

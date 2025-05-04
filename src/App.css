@@ -3,6 +3,12 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  user-select: text; /* Enable text selection globally */
+}
+
+/* Hide cursor when keyboard navigation class is active */
+.keyboard-navigating * {
+  cursor: none !important;
 }
 
 body {
@@ -160,11 +166,37 @@ body {
   overflow-x: auto;
 }
 
+/* Question Header in Answer View */
+.question-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+}
+
+.question-header .home-button {
+  align-self: flex-start;
+  margin-bottom: 1rem;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  background-color: #1e1e1e;
+  border: 1px solid #03dac6;
+  color: #03dac6;
+}
+
+.question-header .home-button:hover {
+  background-color: #03dac6;
+  color: #121212;
+}
+
+.question-header .home-button .nav-icon {
+  color: inherit;
+  font-size: 1.2rem;
+}
+
 /* Question Title in Answer View */
 .question-title {
   color: #e0e0e0;
   font-size: 1.4rem;
-  margin-bottom: 1.5rem;
   position: relative;
   padding-left: 1.5rem;
   line-height: 1.4;
@@ -219,6 +251,8 @@ body {
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   border-left: 4px solid #03dac6;
+  user-select: text;
+  cursor: text;
 }
 
 /* Navigation Controls */
@@ -227,6 +261,27 @@ body {
   justify-content: center;
   margin-top: 2rem;
   gap: 1.5rem;
+}
+
+/* Keyboard Navigation Hint */
+.keyboard-hint {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.keyboard-hint kbd {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.8rem;
+  font-family: monospace;
+  line-height: 1.4;
+  color: #fff;
+  background-color: #333;
+  border-radius: 3px;
+  box-shadow: 0 1px 1px rgba(0,0,0,.2);
+  margin: 0 0.2rem;
 }
 
 .nav-button {
@@ -268,6 +323,8 @@ body {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
+/* Navigation button styles are handled in their respective sections */
 
 /* Navigation Icons */
 .nav-icon {
@@ -333,8 +390,6 @@ code {
 .question-answer li {
   margin-bottom: 0.5rem;
 }
-
-
 
 footer {
   background-color: #1e1e1e;
