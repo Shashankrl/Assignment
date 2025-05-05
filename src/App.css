@@ -7,6 +7,10 @@
 }
 
 /* Hide cursor when keyboard navigation class is active */
+.keyboard-navigating {
+  cursor: none !important;
+}
+
 .keyboard-navigating * {
   cursor: none !important;
 }

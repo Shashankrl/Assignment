@@ -90,7 +90,8 @@ function App() {
     return () => {
       window.removeEventListener('popstate', updateActiveQuestionFromURL);
     };
-  }, [questionsList.length]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Update URL when activeQuestion changes and scroll to top
   useEffect(() => {
@@ -119,16 +120,27 @@ function App() {
     // Only add keyboard listeners when a question is active
     if (!activeQuestion) return;
     
+    // Reference to timeout for auto-disabling keyboard navigation mode
+    let keyboardNavigationTimeout;
+    
     const handleKeyDown = (e) => {
-      // Set keyboard navigating state to true when using navigation keys
-      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'].includes(e.key) && 
+      // Clear any existing timeout
+      if (keyboardNavigationTimeout) {
+        clearTimeout(keyboardNavigationTimeout);
+      }
+      // Set keyboard navigating state to true only when using arrow keys for scrolling
+      if (['ArrowUp', 'ArrowDown'].includes(e.key) && 
           !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        // Force cursor to be hidden immediately
         setIsKeyboardNavigating(true);
-        
-        // Only prevent default for navigation keys
-        if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
-          e.preventDefault();
-        }
+        document.body.style.cursor = 'none';
+      }
+      
+      // For left/right navigation, we don't need to hide the cursor
+      if (['ArrowLeft', 'ArrowRight'].includes(e.key) && 
+          !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        // Only prevent default for left/right navigation keys
+        e.preventDefault();
       }
       
       // Left arrow key - previous question (only when not in text field)
@@ -193,6 +205,8 @@ function App() {
       
       // Escape key - go back to questions list
       if (e.key === 'Escape') {
+        setIsKeyboardNavigating(false);
+        document.body.style.cursor = 'auto';
         setActiveQuestion(null);
         window.scrollTo(0, 0);
       }
@@ -202,6 +216,7 @@ function App() {
     const handleMouseMove = () => {
       if (isKeyboardNavigating) {
         setIsKeyboardNavigating(false);
+        document.body.style.cursor = 'auto';
       }
     };
     
@@ -209,14 +224,29 @@ function App() {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('mousemove', handleMouseMove);
     
+    // Set a timeout to automatically disable keyboard navigation mode after 1 second of inactivity
+    if (isKeyboardNavigating) {
+      keyboardNavigationTimeout = setTimeout(() => {
+        setIsKeyboardNavigating(false);
+        document.body.style.cursor = 'auto';
+      }, 1000);
+    }
+    
     // Clean up
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('mousemove', handleMouseMove);
+      if (keyboardNavigationTimeout) {
+        clearTimeout(keyboardNavigationTimeout);
+      }
     };
-  }, [activeQuestion, QuestionComponents.length, isKeyboardNavigating]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeQuestion, isKeyboardNavigating]);
 
   const toggleQuestion = (id) => {
+    // Ensure cursor is visible when clicking buttons
+    setIsKeyboardNavigating(false);
+    document.body.style.cursor = 'auto';
     setActiveQuestion(id);
     // Scroll to top immediately when toggling questions (instant scroll)
     window.scrollTo(0, 0);
@@ -235,6 +265,8 @@ function App() {
                 <button 
                   className="nav-button home-button" 
                   onClick={() => {
+                    setIsKeyboardNavigating(false);
+                    document.body.style.cursor = 'auto';
                     setActiveQuestion(null);
                     window.scrollTo(0, 0);
                   }}
